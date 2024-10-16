@@ -1,0 +1,38 @@
+.Cell {
+  background: radial-gradient(#a0a0a0, #40414b);
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.Mole {
+  background: #a41aa2;
+}
+
+.Wracked {
+  cursor: not-allowed;
+  position: relative;
+  &:before {
+    content: " ";
+    display: block;
+    position: absolute;
+    top: 0;
+    left: calc(50% - 5px);
+    background: black;
+    width: 10px;
+    height: 100%;
+    transform: rotate(45deg);
+    border-radius: 4px;
+  }
+  &:after {
+    content: " ";
+    display: block;
+    position: absolute;
+    top: calc(50% - 5px);
+    left: 0;
+    background: black;
+    width: 100%;
+    height: 10px;
+    transform: rotate(45deg);
+    border-radius: 4px;
+  }
+}
