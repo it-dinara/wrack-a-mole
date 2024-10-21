@@ -1,62 +1,69 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import Cell from "../Cell/Cell";
 import Start from "../Start/Start";
 import s from "./Table.module.css";
 import { useAppDispatch, useAppSelector } from "../../app/store";
-import { setWinner } from "../../features/counter/counterSlice";
+import {
+  isFailedAction,
+  resetMolesCounter,
+  isWonAction,
+} from "../../features/counter/counterSlice";
 
 type Props = {};
 
 function Table({}: Props) {
-  let arr = new Array(9).fill("");
-  let [mole, setMole] = useState(false);
+  const cells = useAppSelector((state) => state.counter.cells);
+  console.log("cells", cells);
   let [started, setStarted] = useState(false);
-  let [key, setKey] = useState(0);
+  let [resetPage, setResetPage] = useState(0);
   let [timerId, setTimerId] = useState(0);
-  const isWinner = useAppSelector((state) => state.counter.isWinner);
-  isWinner && clearInterval(timerId);
-  console.log("TABLE");
+  const isWinner = useAppSelector((state) => state.counter.isWon);
   const dispatch = useAppDispatch();
-
-  const moleShowed = Math.round(Math.random() * 8);
-  const makeStartDelay = () => {
-    restartGame();
-
+  let [showMole, setShowMole] = useState(false);
+  let [randomMole, setRandomMole] = useState(-1);
+  const gameHandler = () => {
+    setStarted(true);
+    clearInterval(timerId);
+    let cellsLength = 8;
     let id = setInterval(() => {
-      setMole((mole) => !mole);
-    }, 2000);
-    // isWinner && clearInterval(id);
-    // To delay start after the btn "Start/Restart" was clicked
+      const randomNum = Math.round(Math.random() * cellsLength);
+      setRandomMole(randomNum);
+      setShowMole((mole) => !mole);
+      console.log("showMole", showMole);
+    }, 3000);
     setTimerId(id);
   };
 
-  const restartGame = () => {
-    // setKey - to reset page when click btn "Restart"
-    console.log("restart");
-
-    setKey((key) => key + 1);
-    setStarted(true);
-  };
-
   const startGameHandler = () => {
-    console.log("start", isWinner);
     clearInterval(timerId);
-    dispatch(setWinner(false));
-    setTimeout(makeStartDelay, 3000);
+    setResetPage((key) => key + 1);
+    dispatch(isWonAction(false));
+    dispatch(isFailedAction(false));
+    dispatch(resetMolesCounter());
+
+    gameHandler();
   };
 
-  const table = arr.map((cell, index) => {
+  const table = cells.map((_, index) => {
+    const showed =
+      index === randomMole &&
+      !isWinner &&
+      showMole &&
+      cells[randomMole] === "...";
+    console.log("showed", showed);
     return (
       <Cell
         key={index}
-        alt={cell.alt}
-        mole={index === moleShowed && !isWinner && mole}
+        alt={"cell"}
+        mole={showed}
+        index={index}
+        timerId={timerId}
       />
     );
   });
 
   return (
-    <div key={key}>
+    <div key={resetPage}>
       <Start clicked={startGameHandler} started={started} />
       <div className={s.Table}>{table}</div>
     </div>

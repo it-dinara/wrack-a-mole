@@ -1,28 +1,72 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface counterState {
-  value: number;
-  isWinner: boolean;
+  cells: string[];
+  isWon: boolean;
+  isFailed: boolean;
+  wrackedMoles: number;
+  missedMoles: number;
+  showedMoles: number;
 }
 
 const initialState: counterState = {
-  value: 0,
-  isWinner: false,
+  cells: new Array(9).fill("..."),
+  isWon: false,
+  isFailed: false,
+  wrackedMoles: 0,
+  missedMoles: 0,
+  showedMoles: 0,
 };
 
 export const CounterSlice = createSlice({
   name: "counter",
   initialState,
   reducers: {
-    clickCounter: (state) => {
-      state.value = ++state.value;
+    counterShowedMoles: (state) => {
+      state.showedMoles = ++state.showedMoles;
     },
-    setWinner: (state, action: PayloadAction<boolean>) => {
-      state.isWinner = action.payload;
+    counterWrackedMoles: (state) => {
+      state.wrackedMoles = ++state.wrackedMoles;
+    },
+    counterMissedMoles: (state) => {
+      state.missedMoles = ++state.missedMoles;
+    },
+    resetMolesCounter: (state) => {
+      state.wrackedMoles = 0;
+      state.missedMoles = 0;
+      state.wrackedMoles = 0;
+      state.missedMoles = 0;
+      state.cells = new Array(9).fill("...");
+    },
+    isWonAction: (state, action: PayloadAction<boolean>) => {
+      state.isWon = action.payload;
+    },
+    isFailedAction: (state, action: PayloadAction<boolean>) => {
+      state.isFailed = action.payload;
+    },
+    //two functions below are only for clarity, viewing in the console
+    saveInArrayWrackedMoles: (state, action: PayloadAction<number>) => {
+      const arr = state.cells;
+      const index = action.payload;
+      state.cells = arr.toSpliced(index, 1, "wracked");
+    },
+    saveInArrayMissedMoles: (state, action: PayloadAction<number>) => {
+      const arr = state.cells;
+      const index = action.payload;
+      state.cells = arr.toSpliced(index, 1, "missed");
     },
   },
 });
 
-export const { clickCounter, setWinner } = CounterSlice.actions;
+export const {
+  counterShowedMoles,
+  counterWrackedMoles,
+  counterMissedMoles,
+  resetMolesCounter,
+  saveInArrayWrackedMoles,
+  saveInArrayMissedMoles,
+  isFailedAction,
+  isWonAction,
+} = CounterSlice.actions;
 
 export default CounterSlice.reducer;

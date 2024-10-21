@@ -1,7 +1,14 @@
-import { useState, useCallback } from "react";
+import { useState, memo } from "react";
 import s from "./Cell.module.css";
 import classNames from "classnames";
-import { clickCounter, setWinner } from "../../features/counter/counterSlice";
+import {
+  counterWrackedMoles,
+  isWonAction,
+  saveInArrayWrackedMoles,
+  isFailedAction,
+  counterMissedMoles,
+  saveInArrayMissedMoles,
+} from "../../features/counter/counterSlice";
 import { useAppSelector, useAppDispatch } from "../../app/store";
 
 type Props = {
@@ -9,18 +16,36 @@ type Props = {
   boxImage?: string;
   alt?: string;
   mole: boolean;
+  index: number;
+  timerId: number;
 };
 
-const Cell = ({ moleImage, boxImage, mole, ...props }: Props) => {
+const Cell = memo(({ moleImage, boxImage, mole, index, timerId }: Props) => {
   const dispatch = useAppDispatch();
-  const count = useAppSelector((state) => state.counter.value);
-
+  const wrackedMoles = useAppSelector((state) => state.counter.wrackedMoles);
+  const missedMoles = useAppSelector((state) => state.counter.missedMoles);
+  const isFailed = useAppSelector((state) => state.counter.isFailed);
   let [isWracked, setIsWracked] = useState(false);
+
   const wrackFn = () => {
-    if (count === 1) dispatch(setWinner(true));
     if (mole) {
+      console.log("cell's mole");
+      if (wrackedMoles === 2) {
+        dispatch(isWonAction(true));
+        clearInterval(timerId);
+      }
+      dispatch(saveInArrayWrackedMoles(index));
+      dispatch(counterWrackedMoles());
       setIsWracked(true);
-      dispatch(clickCounter());
+    }
+    if (!mole) {
+      console.log("empty cell", missedMoles, isFailed);
+      if (missedMoles === 2) {
+        dispatch(isFailedAction(true));
+        clearInterval(timerId);
+      }
+      dispatch(saveInArrayMissedMoles(index));
+      dispatch(counterMissedMoles());
     }
   };
 
@@ -33,9 +58,9 @@ const Cell = ({ moleImage, boxImage, mole, ...props }: Props) => {
       )}
       onClick={wrackFn}
     >
-      <img src={mole ? moleImage : boxImage} alt={props.alt} />
+      {/* <img src={mole ? moleImage : boxImage} alt={props.alt} /> */}
     </div>
   );
-};
+});
 
 export default Cell;

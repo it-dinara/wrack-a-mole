@@ -1,5 +1,3 @@
-import React from "react";
-import s from "./Game.module.css";
 import Popup from "../Popup/Popup";
 import Table from "../Table/Table";
 import { useAppSelector } from "../../app/store";
@@ -7,10 +5,12 @@ import { useAppSelector } from "../../app/store";
 export interface Props {}
 
 const Game = () => {
-  const winner = useAppSelector((state) => state.counter.isWinner);
+  const isWon = useAppSelector((state) => state.counter.isWon);
+  const isFailed = useAppSelector((state) => state.counter.isFailed);
   return (
     <>
-      {winner && <Popup text={"You won!"} />}
+      {isWon && <Popup text={"You won!"} />}
+      {isFailed && <Popup text={"You lose!"} />}
       <Table />
     </>
   );
