@@ -17,10 +17,9 @@ type Props = {
   alt?: string;
   mole: boolean;
   index: number;
-  timerId: number;
 };
 
-const Cell = memo(({ moleImage, boxImage, mole, index, timerId }: Props) => {
+const Cell = memo(({ moleImage, boxImage, mole, index }: Props) => {
   const dispatch = useAppDispatch();
   const wrackedMoles = useAppSelector((state) => state.counter.wrackedMoles);
   const missedMoles = useAppSelector((state) => state.counter.missedMoles);
@@ -32,7 +31,6 @@ const Cell = memo(({ moleImage, boxImage, mole, index, timerId }: Props) => {
       console.log("cell's mole");
       if (wrackedMoles === 2) {
         dispatch(isWonAction(true));
-        clearInterval(timerId);
       }
       dispatch(saveInArrayWrackedMoles(index));
       dispatch(counterWrackedMoles());
@@ -42,7 +40,6 @@ const Cell = memo(({ moleImage, boxImage, mole, index, timerId }: Props) => {
       console.log("empty cell", missedMoles, isFailed);
       if (missedMoles === 2) {
         dispatch(isFailedAction(true));
-        clearInterval(timerId);
       }
       dispatch(saveInArrayMissedMoles(index));
       dispatch(counterMissedMoles());

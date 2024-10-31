@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Cell from "../Cell/Cell";
 import Start from "../Start/Start";
 import s from "./Table.module.css";
@@ -16,26 +16,25 @@ function Table({}: Props) {
   console.log("cells", cells);
   let [started, setStarted] = useState(false);
   let [resetPage, setResetPage] = useState(0);
-  let [timerId, setTimerId] = useState(0);
+  const intervalRef = useRef<React.MutableRefObject<React.MutableRefObject<number> | number> | number>();
   const isWinner = useAppSelector((state) => state.counter.isWon);
   const dispatch = useAppDispatch();
   let [showMole, setShowMole] = useState(false);
   let [randomMole, setRandomMole] = useState(-1);
   const gameHandler = () => {
     setStarted(true);
-    clearInterval(timerId);
+
     let cellsLength = 8;
-    let id = setInterval(() => {
+    intervalRef.current = setInterval(() => {
       const randomNum = Math.round(Math.random() * cellsLength);
       setRandomMole(randomNum);
       setShowMole((mole) => !mole);
       console.log("showMole", showMole);
     }, 3000);
-    setTimerId(id);
   };
 
   const startGameHandler = () => {
-    clearInterval(timerId);
+    clearInterval(intervalRef as any);
     setResetPage((key) => key + 1);
     dispatch(isWonAction(false));
     dispatch(isFailedAction(false));
@@ -57,7 +56,6 @@ function Table({}: Props) {
         alt={"cell"}
         mole={showed}
         index={index}
-        timerId={timerId}
       />
     );
   });
